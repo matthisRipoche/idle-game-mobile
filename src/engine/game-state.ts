@@ -21,15 +21,12 @@ const GENERATOR_RATE_PER_LEVEL = fromNumber(1);
 
 const MULTIPLIER_BASE_COST_LOG10 = Math.log10(5);
 const MULTIPLIER_COST_GROWTH_LOG10 = Math.log10(1.1);
-// Bonus linéaire (1 + bonus*niveau), pas exponentiel : un facteur par-niveau
-// composé avec un coût géométrique crée un emballement en double-exponentielle
-// (simulation : la moindre variation de courbe fait basculer entre "1e100 en
-// 2 min" et "jamais atteint en 5h"). Le linéaire reste stable à toute échelle.
+// Bonus linéaire, pas exponentiel : composé avec un coût géométrique, un
+// facteur par niveau part en double-exponentielle et devient impossible à équilibrer.
 const MULTIPLIER_BONUS_PER_LEVEL = 1;
 
-// Seuil recalibré par simulation pour viser ~20-30 min de première run avec
-// des courbes stables (le "1e100" de la spec n'était qu'un exemple illustratif
-// du mécanisme de prestige, pas une valeur imposée pour le premier cycle).
+// Seuil recalibré par simulation pour viser ~20-30 min de première run (le
+// 1e100 de la spec n'était qu'un exemple, pas une valeur imposée).
 const PRESTIGE_THRESHOLD_LOG10 = 6;
 const PRESTIGE_MULTIPLIER_PER_POINT = 1;
 
@@ -133,9 +130,7 @@ export function tap(state: GameState, now: number): GameState {
   };
 }
 
-// Résout combien de niveaux d'un coût géométrique (base * growth^level) sont
-// affordables avec `value`, en espace log10 pour rester stable même à très
-// grande échelle (évite d'exponentier des valeurs qui débordent un double).
+// en log10 pour éviter d'exponentier des valeurs qui débordent un double à grande échelle
 function getMaxAffordableLevels(
   value: BigNumber,
   currentLevel: number,
