@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { format } from '@/engine/big-number';
 import { useGameLoop } from '@/hooks/use-game-loop';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -15,10 +16,10 @@ export default function HomeScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ThemedText type="title" style={styles.value}>
-          {Math.floor(state.value)}
+          {format(state.value)}
         </ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {state.generationRate}/s
+          {format(state.generationRate)}/s
         </ThemedText>
 
         <Pressable
@@ -42,7 +43,7 @@ export default function HomeScreen() {
             !canBuyGenerator && styles.buttonDisabled,
             pressed && canBuyGenerator && styles.buttonPressed,
           ]}>
-          <ThemedText type="smallBold">Générateur (+1/s) — {generatorCost}</ThemedText>
+          <ThemedText type="smallBold">Générateur (+1/s) — {format(generatorCost)}</ThemedText>
         </Pressable>
       </SafeAreaView>
     </ThemedView>

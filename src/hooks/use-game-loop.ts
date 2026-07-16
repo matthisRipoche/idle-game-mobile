@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { BigNumber } from '@/engine/big-number';
 import {
   buyGenerator as applyBuyGenerator,
   canBuyGenerator,
@@ -20,7 +21,7 @@ export interface GameLoop {
   state: GameState;
   canTap: boolean;
   tap: () => void;
-  generatorCost: number;
+  generatorCost: BigNumber;
   canBuyGenerator: boolean;
   buyGenerator: () => void;
 }
