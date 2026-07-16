@@ -9,7 +9,19 @@ import { useGameLoop } from '@/hooks/use-game-loop';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function HomeScreen() {
-  const { state, canTap, tap, generatorCost, canBuyGenerator, buyGenerator } = useGameLoop();
+  const {
+    state,
+    canTap,
+    tap,
+    generatorCost,
+    canBuyGenerator,
+    buyGenerator,
+    effectiveGenerationRate,
+    prestigeMultiplier,
+    prestigeProgress,
+    canPrestige,
+    prestige,
+  } = useGameLoop();
   const theme = useTheme();
 
   return (
@@ -19,7 +31,7 @@ export default function HomeScreen() {
           {format(state.value)}
         </ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {format(state.generationRate)}/s
+          {format(effectiveGenerationRate)}/s · x{prestigeMultiplier.toFixed(2)}
         </ThemedText>
 
         <Pressable
@@ -44,6 +56,20 @@ export default function HomeScreen() {
             pressed && canBuyGenerator && styles.buttonPressed,
           ]}>
           <ThemedText type="smallBold">Générateur (+1/s) — {format(generatorCost)}</ThemedText>
+        </Pressable>
+
+        <Pressable
+          onPress={prestige}
+          disabled={!canPrestige}
+          style={({ pressed }) => [
+            styles.button,
+            { backgroundColor: theme.backgroundElement },
+            !canPrestige && styles.buttonDisabled,
+            pressed && canPrestige && styles.buttonPressed,
+          ]}>
+          <ThemedText type="smallBold">
+            {canPrestige ? 'Cycle' : `Cycle — ${Math.floor(prestigeProgress * 100)}%`}
+          </ThemedText>
         </Pressable>
       </SafeAreaView>
     </ThemedView>

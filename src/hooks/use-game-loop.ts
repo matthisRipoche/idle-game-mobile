@@ -4,14 +4,19 @@ import { BigNumber } from '@/engine/big-number';
 import {
   buyGenerator as applyBuyGenerator,
   canBuyGenerator,
+  canPrestige,
   canTap as checkCanTap,
   createInitialState,
   GameState,
+  getEffectiveGenerationRate,
   getGeneratorCost,
+  getPrestigeMultiplier,
+  getPrestigeProgress,
+  prestige as applyPrestige,
   tap as applyTap,
   tick,
 } from '@/engine/game-state';
-import { triggerPurchaseHaptic, triggerTapHaptic } from '@/services/haptics';
+import { triggerPrestigeHaptic, triggerPurchaseHaptic, triggerTapHaptic } from '@/services/haptics';
 import { loadGameState, saveGameState } from '@/services/storage';
 
 const TICK_INTERVAL_MS = 100;
@@ -24,6 +29,11 @@ export interface GameLoop {
   generatorCost: BigNumber;
   canBuyGenerator: boolean;
   buyGenerator: () => void;
+  effectiveGenerationRate: BigNumber;
+  prestigeMultiplier: number;
+  prestigeProgress: number;
+  canPrestige: boolean;
+  prestige: () => void;
 }
 
 export function useGameLoop(): GameLoop {
@@ -87,6 +97,15 @@ export function useGameLoop(): GameLoop {
     setState((current) => applyBuyGenerator(current));
   }, [state]);
 
+  const prestigeAction = useCallback(() => {
+    if (!canPrestige(state)) {
+      return;
+    }
+
+    triggerPrestigeHaptic();
+    setState((current) => applyPrestige(current));
+  }, [state]);
+
   return {
     state,
     canTap: checkCanTap(state, now),
@@ -94,5 +113,10 @@ export function useGameLoop(): GameLoop {
     generatorCost: getGeneratorCost(state.generatorLevel),
     canBuyGenerator: canBuyGenerator(state),
     buyGenerator: buyGeneratorAction,
+    effectiveGenerationRate: getEffectiveGenerationRate(state),
+    prestigeMultiplier: getPrestigeMultiplier(state),
+    prestigeProgress: getPrestigeProgress(state),
+    canPrestige: canPrestige(state),
+    prestige: prestigeAction,
   };
 }

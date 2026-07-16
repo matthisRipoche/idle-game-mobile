@@ -5,6 +5,7 @@ export interface GameState {
   generationRate: BigNumber;
   nextTapAvailableAt: number;
   generatorLevel: number;
+  prestigePoints: number;
 }
 
 const TAP_AMOUNT = fromNumber(5);
@@ -14,19 +15,32 @@ const GENERATOR_BASE_COST_LOG10 = Math.log10(10);
 const GENERATOR_COST_GROWTH_LOG10 = Math.log10(1.15);
 const GENERATOR_RATE_PER_LEVEL = fromNumber(1);
 
+// TODO: remonter à 100 (1e100, cf spec) une fois le rythme de progression équilibré
+const PRESTIGE_THRESHOLD_LOG10 = 8;
+const PRESTIGE_MULTIPLIER_PER_POINT = 1;
+
 export function createInitialState(): GameState {
   return {
     value: fromNumber(0),
     generationRate: fromNumber(1),
     nextTapAvailableAt: 0,
     generatorLevel: 0,
+    prestigePoints: 0,
   };
+}
+
+export function getPrestigeMultiplier(state: GameState): number {
+  return 1 + state.prestigePoints * PRESTIGE_MULTIPLIER_PER_POINT;
+}
+
+export function getEffectiveGenerationRate(state: GameState): BigNumber {
+  return multiply(state.generationRate, getPrestigeMultiplier(state));
 }
 
 export function tick(state: GameState, deltaSeconds: number): GameState {
   return {
     ...state,
-    value: add(state.value, multiply(state.generationRate, deltaSeconds)),
+    value: add(state.value, multiply(getEffectiveGenerationRate(state), deltaSeconds)),
   };
 }
 
@@ -64,5 +78,36 @@ export function buyGenerator(state: GameState): GameState {
     value: subtract(state.value, getGeneratorCost(state.generatorLevel)),
     generatorLevel: state.generatorLevel + 1,
     generationRate: add(state.generationRate, GENERATOR_RATE_PER_LEVEL),
+  };
+}
+
+function getValueLog10(value: BigNumber): number {
+  if (value.mantissa === 0) {
+    return -Infinity;
+  }
+
+  return value.exponent + Math.log10(value.mantissa);
+}
+
+export function getPrestigeProgress(state: GameState): number {
+  return Math.max(0, Math.min(1, getValueLog10(state.value) / PRESTIGE_THRESHOLD_LOG10));
+}
+
+export function canPrestige(state: GameState): boolean {
+  return getValueLog10(state.value) >= PRESTIGE_THRESHOLD_LOG10;
+}
+
+export function getPrestigeGain(state: GameState): number {
+  return Math.max(0, getValueLog10(state.value) - PRESTIGE_THRESHOLD_LOG10 + 1);
+}
+
+export function prestige(state: GameState): GameState {
+  if (!canPrestige(state)) {
+    return state;
+  }
+
+  return {
+    ...createInitialState(),
+    prestigePoints: state.prestigePoints + getPrestigeGain(state),
   };
 }
