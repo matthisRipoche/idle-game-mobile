@@ -8,7 +8,7 @@ import { useGameLoop } from '@/hooks/use-game-loop';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function HomeScreen() {
-  const { state, canTap, tap } = useGameLoop();
+  const { state, canTap, tap, generatorCost, canBuyGenerator, buyGenerator } = useGameLoop();
   const theme = useTheme();
 
   return (
@@ -17,17 +17,32 @@ export default function HomeScreen() {
         <ThemedText type="title" style={styles.value}>
           {Math.floor(state.value)}
         </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {state.generationRate}/s
+        </ThemedText>
 
         <Pressable
           onPress={tap}
           disabled={!canTap}
           style={({ pressed }) => [
-            styles.tapButton,
+            styles.button,
             { backgroundColor: theme.backgroundElement },
-            !canTap && styles.tapButtonDisabled,
-            pressed && canTap && styles.tapButtonPressed,
+            !canTap && styles.buttonDisabled,
+            pressed && canTap && styles.buttonPressed,
           ]}>
           <ThemedText type="smallBold">Tap</ThemedText>
+        </Pressable>
+
+        <Pressable
+          onPress={buyGenerator}
+          disabled={!canBuyGenerator}
+          style={({ pressed }) => [
+            styles.button,
+            { backgroundColor: theme.backgroundElement },
+            !canBuyGenerator && styles.buttonDisabled,
+            pressed && canBuyGenerator && styles.buttonPressed,
+          ]}>
+          <ThemedText type="smallBold">Générateur (+1/s) — {generatorCost}</ThemedText>
         </Pressable>
       </SafeAreaView>
     </ThemedView>
@@ -44,7 +59,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: Spacing.five,
+    gap: Spacing.three,
     paddingHorizontal: Spacing.four,
     paddingBottom: BottomTabInset + Spacing.three,
     maxWidth: MaxContentWidth,
@@ -52,15 +67,16 @@ const styles = StyleSheet.create({
   value: {
     fontVariant: ['tabular-nums'],
   },
-  tapButton: {
+  button: {
     paddingHorizontal: Spacing.five,
     paddingVertical: Spacing.three,
     borderRadius: Spacing.five,
+    marginTop: Spacing.three,
   },
-  tapButtonDisabled: {
+  buttonDisabled: {
     opacity: 0.3,
   },
-  tapButtonPressed: {
+  buttonPressed: {
     opacity: 0.7,
   },
 });
