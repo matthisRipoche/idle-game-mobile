@@ -11,3 +11,7 @@ export function triggerPurchaseHaptic() {
 export function triggerPrestigeHaptic() {
   Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 }
+
+export function triggerBoostHaptic() {
+  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+}

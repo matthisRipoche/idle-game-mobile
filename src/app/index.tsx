@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { format } from '@/engine/big-number';
-import { useGameLoop } from '@/hooks/use-game-loop';
+import { useGame } from '@/hooks/game-loop-context';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function HomeScreen() {
@@ -21,7 +21,9 @@ export default function HomeScreen() {
     prestigeProgress,
     canPrestige,
     prestige,
-  } = useGameLoop();
+    isBoostActive,
+    boostRemainingSeconds,
+  } = useGame();
   const theme = useTheme();
 
   return (
@@ -33,6 +35,9 @@ export default function HomeScreen() {
         <ThemedText type="small" themeColor="textSecondary">
           {format(effectiveGenerationRate)}/s · x{prestigeMultiplier.toFixed(2)}
         </ThemedText>
+        {isBoostActive && (
+          <ThemedText type="smallBold">Boost x3 — {boostRemainingSeconds}s</ThemedText>
+        )}
 
         <Pressable
           onPress={tap}
