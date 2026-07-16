@@ -3,7 +3,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { BigNumber } from '@/engine/big-number';
 import {
   buyGenerator as applyBuyGenerator,
+  buyMaxGenerator as applyBuyMaxGenerator,
+  buyMaxMultiplier as applyBuyMaxMultiplier,
+  buyMultiplier as applyBuyMultiplier,
   canBuyGenerator,
+  canBuyMultiplier,
   canPrestige,
   canTap as checkCanTap,
   canTriggerBoost,
@@ -12,6 +16,9 @@ import {
   GameState,
   getEffectiveGenerationRate,
   getGeneratorCost,
+  getMaxAffordableGeneratorLevels,
+  getMaxAffordableMultiplierLevels,
+  getMultiplierCost,
   getPrestigeMultiplier,
   getPrestigeProgress,
   getShakeBoostUnlockCost,
@@ -41,6 +48,13 @@ export interface GameLoop {
   generatorCost: BigNumber;
   canBuyGenerator: boolean;
   buyGenerator: () => void;
+  maxAffordableGeneratorLevels: number;
+  buyMaxGenerator: () => void;
+  multiplierCost: BigNumber;
+  canBuyMultiplier: boolean;
+  buyMultiplier: () => void;
+  maxAffordableMultiplierLevels: number;
+  buyMaxMultiplier: () => void;
   effectiveGenerationRate: BigNumber;
   prestigeMultiplier: number;
   prestigeProgress: number;
@@ -135,6 +149,33 @@ export function useGameLoop(): GameLoop {
     setState((current) => applyBuyGenerator(current));
   }, [state]);
 
+  const buyMaxGeneratorAction = useCallback(() => {
+    if (getMaxAffordableGeneratorLevels(state) <= 0) {
+      return;
+    }
+
+    triggerPurchaseHaptic();
+    setState((current) => applyBuyMaxGenerator(current));
+  }, [state]);
+
+  const buyMultiplierAction = useCallback(() => {
+    if (!canBuyMultiplier(state)) {
+      return;
+    }
+
+    triggerPurchaseHaptic();
+    setState((current) => applyBuyMultiplier(current));
+  }, [state]);
+
+  const buyMaxMultiplierAction = useCallback(() => {
+    if (getMaxAffordableMultiplierLevels(state) <= 0) {
+      return;
+    }
+
+    triggerPurchaseHaptic();
+    setState((current) => applyBuyMaxMultiplier(current));
+  }, [state]);
+
   const prestigeAction = useCallback(() => {
     if (!canPrestige(state)) {
       return;
@@ -160,6 +201,13 @@ export function useGameLoop(): GameLoop {
     generatorCost: getGeneratorCost(state.generatorLevel),
     canBuyGenerator: canBuyGenerator(state),
     buyGenerator: buyGeneratorAction,
+    maxAffordableGeneratorLevels: getMaxAffordableGeneratorLevels(state),
+    buyMaxGenerator: buyMaxGeneratorAction,
+    multiplierCost: getMultiplierCost(state.multiplierLevel),
+    canBuyMultiplier: canBuyMultiplier(state),
+    buyMultiplier: buyMultiplierAction,
+    maxAffordableMultiplierLevels: getMaxAffordableMultiplierLevels(state),
+    buyMaxMultiplier: buyMaxMultiplierAction,
     effectiveGenerationRate: getEffectiveGenerationRate(state, now),
     prestigeMultiplier: getPrestigeMultiplier(state),
     prestigeProgress: getPrestigeProgress(state),
