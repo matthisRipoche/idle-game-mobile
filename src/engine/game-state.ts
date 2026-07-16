@@ -16,15 +16,21 @@ const TAP_AMOUNT = fromNumber(5);
 const TAP_COOLDOWN_MS = 1000;
 
 const GENERATOR_BASE_COST_LOG10 = Math.log10(10);
-const GENERATOR_COST_GROWTH_LOG10 = Math.log10(1.15);
+const GENERATOR_COST_GROWTH_LOG10 = Math.log10(1.08);
 const GENERATOR_RATE_PER_LEVEL = fromNumber(1);
 
-const MULTIPLIER_BASE_COST_LOG10 = Math.log10(50);
-const MULTIPLIER_COST_GROWTH_LOG10 = Math.log10(1.4);
-const MULTIPLIER_FACTOR_PER_LEVEL = 1.5;
+const MULTIPLIER_BASE_COST_LOG10 = Math.log10(5);
+const MULTIPLIER_COST_GROWTH_LOG10 = Math.log10(1.1);
+// Bonus linéaire (1 + bonus*niveau), pas exponentiel : un facteur par-niveau
+// composé avec un coût géométrique crée un emballement en double-exponentielle
+// (simulation : la moindre variation de courbe fait basculer entre "1e100 en
+// 2 min" et "jamais atteint en 5h"). Le linéaire reste stable à toute échelle.
+const MULTIPLIER_BONUS_PER_LEVEL = 1;
 
-// TODO: remonter à 100 (1e100, cf spec) une fois le rythme de progression équilibré
-const PRESTIGE_THRESHOLD_LOG10 = 8;
+// Seuil recalibré par simulation pour viser ~20-30 min de première run avec
+// des courbes stables (le "1e100" de la spec n'était qu'un exemple illustratif
+// du mécanisme de prestige, pas une valeur imposée pour le premier cycle).
+const PRESTIGE_THRESHOLD_LOG10 = 6;
 const PRESTIGE_MULTIPLIER_PER_POINT = 1;
 
 const SHAKE_BOOST_UNLOCK_COST = fromNumber(200);
@@ -59,7 +65,7 @@ function getBoostMultiplier(state: GameState, now: number): number {
 }
 
 function getMultiplierUpgradeFactor(state: GameState): number {
-  return Math.pow(MULTIPLIER_FACTOR_PER_LEVEL, state.multiplierLevel);
+  return 1 + MULTIPLIER_BONUS_PER_LEVEL * state.multiplierLevel;
 }
 
 export function getEffectiveGenerationRate(state: GameState, now: number): BigNumber {

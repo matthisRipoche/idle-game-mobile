@@ -13,16 +13,6 @@ export default function HomeScreen() {
     state,
     canTap,
     tap,
-    generatorCost,
-    canBuyGenerator,
-    buyGenerator,
-    maxAffordableGeneratorLevels,
-    buyMaxGenerator,
-    multiplierCost,
-    canBuyMultiplier,
-    buyMultiplier,
-    maxAffordableMultiplierLevels,
-    buyMaxMultiplier,
     effectiveGenerationRate,
     prestigeMultiplier,
     prestigeProgress,
@@ -57,60 +47,6 @@ export default function HomeScreen() {
           ]}>
           <ThemedText type="smallBold">Tap</ThemedText>
         </Pressable>
-
-        <ThemedView style={styles.purchaseRow}>
-          <Pressable
-            onPress={buyGenerator}
-            disabled={!canBuyGenerator}
-            style={({ pressed }) => [
-              styles.button,
-              styles.mainPurchaseButton,
-              { backgroundColor: theme.backgroundElement },
-              !canBuyGenerator && styles.buttonDisabled,
-              pressed && canBuyGenerator && styles.buttonPressed,
-            ]}>
-            <ThemedText type="smallBold">Générateur (+1/s) — {format(generatorCost)}</ThemedText>
-          </Pressable>
-
-          <Pressable
-            onPress={buyMaxGenerator}
-            disabled={maxAffordableGeneratorLevels <= 0}
-            style={({ pressed }) => [
-              styles.button,
-              { backgroundColor: theme.backgroundElement },
-              maxAffordableGeneratorLevels <= 0 && styles.buttonDisabled,
-              pressed && maxAffordableGeneratorLevels > 0 && styles.buttonPressed,
-            ]}>
-            <ThemedText type="smallBold">Max x{maxAffordableGeneratorLevels}</ThemedText>
-          </Pressable>
-        </ThemedView>
-
-        <ThemedView style={styles.purchaseRow}>
-          <Pressable
-            onPress={buyMultiplier}
-            disabled={!canBuyMultiplier}
-            style={({ pressed }) => [
-              styles.button,
-              styles.mainPurchaseButton,
-              { backgroundColor: theme.backgroundElement },
-              !canBuyMultiplier && styles.buttonDisabled,
-              pressed && canBuyMultiplier && styles.buttonPressed,
-            ]}>
-            <ThemedText type="smallBold">Multiplicateur (x1.5) — {format(multiplierCost)}</ThemedText>
-          </Pressable>
-
-          <Pressable
-            onPress={buyMaxMultiplier}
-            disabled={maxAffordableMultiplierLevels <= 0}
-            style={({ pressed }) => [
-              styles.button,
-              { backgroundColor: theme.backgroundElement },
-              maxAffordableMultiplierLevels <= 0 && styles.buttonDisabled,
-              pressed && maxAffordableMultiplierLevels > 0 && styles.buttonPressed,
-            ]}>
-            <ThemedText type="smallBold">Max x{maxAffordableMultiplierLevels}</ThemedText>
-          </Pressable>
-        </ThemedView>
 
         <Pressable
           onPress={prestige}
@@ -148,18 +84,11 @@ const styles = StyleSheet.create({
   value: {
     fontVariant: ['tabular-nums'],
   },
-  purchaseRow: {
-    flexDirection: 'row',
-    gap: Spacing.two,
-  },
   button: {
     paddingHorizontal: Spacing.five,
     paddingVertical: Spacing.three,
     borderRadius: Spacing.five,
     marginTop: Spacing.three,
-  },
-  mainPurchaseButton: {
-    flex: 1,
   },
   buttonDisabled: {
     opacity: 0.3,
